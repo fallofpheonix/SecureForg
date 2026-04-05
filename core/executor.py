@@ -2,7 +2,11 @@ import subprocess
 import tempfile
 import os
 
-def execute_code(code: str, payload: str, timeout=3):
+def execute(code: str, payload: str, timeout=2) -> dict:
+    """
+    Controlled subprocess execution.
+    No shared globals, isolated process state, cleanup guaranteed.
+    """
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write(code)
         path = f.name
@@ -17,8 +21,8 @@ def execute_code(code: str, payload: str, timeout=3):
         )
 
         return {
-            "stdout": result.stdout,
-            "stderr": result.stderr,
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip(),
             "exit_code": result.returncode
         }
 
@@ -32,5 +36,5 @@ def execute_code(code: str, payload: str, timeout=3):
     finally:
         try:
             os.unlink(path)
-        except:
+        except OSError:
             pass
