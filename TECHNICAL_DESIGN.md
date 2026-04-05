@@ -2,50 +2,28 @@
 
 ## Core Loop
 
-```
-1. Plan Attack
-2. Generate Payloads
-3. Execute Code
-4. Detect Exploit
-5. Generate Patch
-6. Validate Fix
-7. Generate Explanation
+```text
+input code
+→ generate static payloads
+→ execute benign baseline
+→ execute attack
+→ compare outputs behaviorally (diff)
+→ report vulnerability
 ```
 
 ---
 
 ## Components
 
-### Adversarial Planner
-
-* Input: full code context
-* Output: vulnerability + exploit strategy
-
-### Attack Generator
-
-* Converts strategy into payloads
-
 ### Sandbox Executor
+* **Input**: Python code string and stdin payload
+* **Output**: Pure dictionary `{stdout, stderr, exit_code}`
+* Runs strictly configured `subprocess.run()` logic over temp filesystem writes to ensure strict timeout safety parameters are met locally.
 
-* Runs code in isolated environment
+### Behavioral Output Detector
+* Does **not** employ any regex, JSON, heuristic tracking or logic loops.
+* **Logic**: Evaluates whether `attack["stdout"] != benign["stdout"]`, whether there is a crash in standard error, or a massive jump in data size.
 
-### Exploit Detector
-
-* Determines attack success
-
-### Patch Generator
-
-* Produces secure code fix
-
-### Validation Engine
-
-* Re-tests system after fix
-
----
-
-## Design Principles
-
-* Execution > Prediction
-* Minimal patching
-* Deterministic validation
-* Offline-first architecture
+### Analysis & Payloads Stage
+* Returns static payload test sets.
+* Returns AST (Abstract Syntax Tree) string tracking for fallback safety scanning exclusively (not relying on API endpoints).

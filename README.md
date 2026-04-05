@@ -1,137 +1,43 @@
-# Sentinel-Scribe: Adversarial Reasoning Engine
+# Sentinel-Scribe: Execution-Grounded Verification Engine
 
 ## Overview
 
-Sentinel-Scribe is an **offline autonomous system** that verifies and secures code through adversarial reasoning.
+Sentinel-Scribe is an **offline autonomous engine** that verifies and secures logic through strict execution-grounded reasoning. It is designed around local reliability, fully omitting nondeterministic LLM APIs in structural verification routes.
 
-Instead of trusting AI-generated code, Sentinel-Scribe:
-
-* Identifies vulnerabilities
-* Generates real exploits
-* Executes attacks
-* Fixes insecure code
-* Verifies the fix through re-execution
-* Explains the reasoning to the developer
-
-This transforms AI from a **code generator** into a **verified engineering system**.
+Instead of trusting keyword or confidence-weighted scores, Sentinel-Scribe proves incorrectness through pure behavioral analysis.
 
 ---
 
-## Core Idea
+## Core System Boundaries
 
-Traditional AI systems rely on:
-
-* static analysis
-* confidence scores
-* self-verification
-
-Sentinel-Scribe replaces this with:
-
-**Execution-Grounded Verification**
-
-```
-Plan → Attack → Execute → Detect → Fix → Re-Verify → Teach
+```text
+Input source
+ ↓
+Deterministic Payload Matrix (SQLi, CMDi, Eval) + Static AST Safety Net
+ ↓
+Process Safebox (Baseline)
+ ↓
+Process Safebox (Attack Sequence)
+ ↓
+Behavioral Delta Inspector
+ ↓
+Deterministic Vulnerability Score
 ```
 
 ---
 
-## Key Features
+## System Proofing Rules
 
-### 1. Adversarial Reasoning
-
-* Thinks like an attacker
-* Identifies trust boundary violations
-* Generates exploit strategies
-
-### 2. Dynamic Attack Generation
-
-* Creates context-aware payloads
-* Executes real attacks in sandbox
-
-### 3. Execution-Based Validation
-
-* Uses runtime behavior as ground truth
-* No reliance on LLM confidence
-
-### 4. Automatic Secure Repair
-
-* Fixes vulnerabilities using secure coding practices
-* Preserves original functionality
-
-### 5. Re-Attack Verification
-
-* Confirms exploit is fully mitigated
-* Provides measurable security proof
-
-### 6. Socratic Teaching Layer
-
-* Explains vulnerabilities
-* Guides developer reasoning
-
----
-
-## Architecture
-
-```
-Input Code
- ↓
-Context Loader
- ↓
-Adversarial Planner
- ↓
-Attack Generator
- ↓
-Sandbox Executor
- ↓
-Exploit Detector
- ↓
-Patch Generator
- ↓
-Validation Engine
- ↓
-Socratic Engine
- ↓
-Output + UI
-```
-
----
-
-## Example Flow
-
-### Vulnerable Code
-
-```python
-query = "SELECT * FROM users WHERE id=" + user_input
-```
-
-### Attack
-
-```
-Payload: ' OR 1=1 --
-Result: LOGIN BYPASSED
-```
-
-### Fix
-
-```python
-query = "SELECT * FROM users WHERE id=%s"
-cursor.execute(query, (user_input,))
-```
-
-### Verification
-
-```
-Payload: ' OR 1=1 --
-Result: Blocked
-```
+1. **No External LLM Failure Points**: Operation runs 100% offline via native `subprocess` and `ast`.
+2. **Behavioral Integrity**: Code vulnerabilities are matched _exclusively_ based on output behavioral deltas generated against benign execution loops.
+3. **Factual Exploitation Surfaces**: Uses non-mocked data schemas (`demo/` evaluates real SQLite in-memory).
 
 ---
 
 ## Installation
 
 ```bash
-pip install ollama streamlit
-ollama pull gemma4:e4b
+pip install streamlit
 ```
 
 ---
@@ -140,74 +46,38 @@ ollama pull gemma4:e4b
 
 ### CLI
 
+The single required entry point parses a file target parameter.
+
 ```bash
-python main.py
+python app/cli.py --file demo/sql_injection.py
 ```
 
 ### UI
 
+Streamlit executes the visualization.
+
 ```bash
-streamlit run app.py
+streamlit run app/ui.py
 ```
 
 ---
 
 ## Project Structure
 
-```
-sentinel_scribe/
-├── modules/
-│   ├── context_loader.py
-│   ├── adversarial_planner.py
-│   ├── attack_generator.py
-│   ├── sandbox_executor.py
-│   ├── exploit_detector.py
-│   ├── patch_generator.py
-│   ├── validation_engine.py
-│   ├── socratic_engine.py
-│
-├── pipeline.py
+```text
+app/
 ├── cli.py
-├── utils.py
+├── ui.py
+analysis/
+├── ast_analyzer.py
+├── payloads.py
+core/
+├── executor.py
+├── detector.py
+├── validator.py
+demo/
+├── command_injection.py
+├── sql_injection.py
+├── code_injection.py
+pipeline.py
 ```
-
----
-
-## Metrics
-
-* Attack Success Rate (Before Fix)
-* Attack Block Rate (After Fix)
-* Security Improvement Score
-* Execution Time
-
----
-
-## Use Cases
-
-* Secure AI-generated code
-* Offline development environments
-* Educational security training
-* Critical infrastructure systems
-
----
-
-## Limitations
-
-* Currently supports single vulnerability type (injection)
-* Heuristic-based exploit detection
-* Patch generation may need refinement
-
----
-
-## Future Work
-
-* Multi-vulnerability support
-* AST-based patching
-* Advanced fuzzing
-* Semantic exploit detection
-
----
-
-## License
-
-MIT License

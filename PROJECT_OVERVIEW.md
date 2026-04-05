@@ -55,17 +55,15 @@ Sentinel-Scribe:
 ```text
 Code Input
  ↓
-Adversarial Planner (LLM + fallback)
+Deterministic Payload Generator
  ↓
-Attack Generator
+Sandbox Executor (Benign Baseline)
  ↓
-Sandbox Executor
+Sandbox Executor (Attack Evaluation)
  ↓
-Behavioral Detector
+Behavioral Diff Detector
  ↓
-Patch Generator
- ↓
-Re-Execution Validator
+Vulnerability Report Output
 ```
 
 ---
@@ -95,18 +93,7 @@ Same input:
 User Found: ID = 1
 ```
 
----
 
-## Metrics
-
-| Metric             | Value |
-| ------------------ | ----- |
-| Detection Accuracy | 92%   |
-| False Positives    | <5%   |
-| Execution Time     | <3s   |
-| Offline Capability | Yes   |
-
----
 
 ## Impact
 
