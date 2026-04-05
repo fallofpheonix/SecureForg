@@ -9,7 +9,7 @@ cursor.execute("INSERT INTO users VALUES (2, 'Secret User')")
 
 user_input = input()
 
-query = "SELECT * FROM users WHERE id='" + user_input + "'"
-cursor.execute(query)
+query = "SELECT * FROM users WHERE id = ?"
+cursor.execute(query, (user_input,))
 
 print(cursor.fetchall())

@@ -1,1 +1,3 @@
-streamlit
+# No required third-party dependencies.
+# Optional only if a UI is reintroduced later:
+# streamlit

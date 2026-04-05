@@ -4,26 +4,27 @@
 
 ```text
 input code
-→ generate static payloads
-→ execute benign baseline
-→ execute attack
-→ compare outputs behaviorally (diff)
-→ report vulnerability
+-> generate static payloads
+-> execute benign baseline
+-> execute attack
+-> compare stdout/stderr/exit_code exactly
+-> report vulnerability
 ```
-
----
 
 ## Components
 
-### Sandbox Executor
+### Executor
+
 * **Input**: Python code string and stdin payload
-* **Output**: Pure dictionary `{stdout, stderr, exit_code}`
-* Runs strictly configured `subprocess.run()` logic over temp filesystem writes to ensure strict timeout safety parameters are met locally.
+* **Output**: dictionary `{stdout, stderr, exit_code}`
+* Runs the target in a fresh subprocess from a temporary file
 
-### Behavioral Output Detector
-* Does **not** employ any regex, JSON, heuristic tracking or logic loops.
-* **Logic**: Evaluates whether `attack["stdout"] != benign["stdout"]`, whether there is a crash in standard error, or a massive jump in data size.
+### Behavioral Diff Detector
 
-### Analysis & Payloads Stage
-* Returns static payload test sets.
-* Returns AST (Abstract Syntax Tree) string tracking for fallback safety scanning exclusively (not relying on API endpoints).
+* No regex, keywords, scoring, or model inference
+* Reports a change iff any of `stdout`, `stderr`, or `exit_code` differs from baseline
+
+### Payload Generator
+
+* Returns a fixed ordered payload set
+* Current categories: SQL injection, command injection, code injection

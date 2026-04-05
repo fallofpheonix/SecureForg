@@ -1,3 +1,5 @@
+SAFE_INPUT = "1"
+
 def generate_payloads() -> list:
     """
     Deterministic payload generation logic. No LLM randomness.

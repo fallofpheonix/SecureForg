@@ -1,8 +1,11 @@
 def detect_behavior_change(benign: dict, attack: dict) -> bool:
     """
-    Behavioral diffing. Single source of truth.
-    No keywords, no heuristics, no LLM.
+    Behavioral diff over process outputs.
+    No regex, no LLM, no vulnerability typing.
     """
+    if attack["timeout"]:
+        return True
+
     if benign["stdout"] != attack["stdout"]:
         return True
 

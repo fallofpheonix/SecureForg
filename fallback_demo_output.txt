@@ -1,0 +1,24 @@
+$ python cli.py --file examples/sql_vuln.py
+[EXEC] payload=' OR 1=1 --
+[OUT] stdout="[(1, 'Admin Data'), (2, 'Secret User')]" stderr='' exit_code=0 timeout=False
+[RESULT] vulnerable=True
+[EXEC] payload=; ls
+[OUT] stdout='[]' stderr='' exit_code=0 timeout=False
+[RESULT] vulnerable=True
+[EXEC] payload=__import__('os').system('echo PWNED')
+[OUT] stdout='' stderr='Traceback (most recent call last):\n  File "<target>", line 13, in <module>\n    cursor.execute(query)\nsqlite3.OperationalError: near "os": syntax error' exit_code=1 timeout=False
+[RESULT] vulnerable=True
+{
+  "status": "vulnerable",
+  "reason": "behavioral deviation detected",
+  "analysis": {
+    "type": "sql_injection",
+    "confidence": "low (static heuristic)",
+    "source": "ast"
+  },
+  "execution": {
+    "safe_input": "1",
+    "payloads_tested": 3,
+    "vulnerable_payloads": 3
+  }
+}
