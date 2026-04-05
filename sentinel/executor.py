@@ -2,18 +2,18 @@ import subprocess
 import tempfile
 import os
 
-def execute_code(code: str, payload: str):
+def execute_code(code: str, payload: str, timeout=3):
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write(code)
-        file_path = f.name
+        path = f.name
 
     try:
         result = subprocess.run(
-            ["python", file_path],
+            ["python3", path],
             input=payload,
             text=True,
             capture_output=True,
-            timeout=2
+            timeout=timeout
         )
 
         return {
@@ -22,8 +22,15 @@ def execute_code(code: str, payload: str):
             "exit_code": result.returncode
         }
 
-    except Exception as e:
-        return {"error": str(e)}
+    except subprocess.TimeoutExpired:
+        return {
+            "stdout": "",
+            "stderr": "TIMEOUT",
+            "exit_code": -1
+        }
 
     finally:
-        os.unlink(file_path)
+        try:
+            os.unlink(path)
+        except:
+            pass
